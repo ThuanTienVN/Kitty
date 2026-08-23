@@ -162,5 +162,11 @@ async def on_message(message):
                     )
                 # Phản hồi tại kênh hiện tại
                 await message.channel.send(f"Đã gỡ ban cho {target.mention}")
-                
+
+        elif content == "ngive":
+            if not message.mentions:
+                await message.channel.send("❌ Cú pháp không hợp lệ. Ví dụ: `ngive @user 100k gold")
+                return
+
+                 
 bot.run(os.environ['DISCORD_TOKEN'])
