@@ -14,7 +14,7 @@ def home():
 
 # --- Biến lưu trữ & Cấu hình ID ---
 ADMIN_ID = 1517328324618096711     # THAY BẰNG ID CỦA BẠN
-LOG_CHANNEL_ID = 1525836950928494753 # THAY BẰNG ID KÊNH LOG CỦA BẠN
+LOG_CHANNEL_ID = 1540982626364559370 # THAY BẰNG ID KÊNH LOG CỦA BẠN
 
 inventory = {}      
 fish_storage = {}   
