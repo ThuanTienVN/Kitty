@@ -86,7 +86,8 @@ async def on_message(message):
         'chim',
         'khoan',
         'job',
-        'njob'
+        'njob',
+        'bruh'
     ]
 
     # --- Danh sách các lệnh kinh tế/tương tác sẽ bị cấm khi bị ban ---
@@ -311,8 +312,10 @@ async def on_message(message):
     elif command_name == 'meow':
         if os.path.exists("meow.png"):
             await message.channel.send(file=discord.File("meow.png"))
-        else:
-            await message.channel.send("Ảnh `meow.png` không tồn tại trong thư mục dự án!")
+
+    elif command_name == 'bruh':
+        if os.path.exists("bruh.png"):
+            await message.channel.send(file=discord.File("bruh.png"))
 
     elif command_name == 'bum':
         await message.channel.send("https://cdn.discordapp.com/attachments/1505482821580619918/1537259392603258970/buhflipexplode.gif")
