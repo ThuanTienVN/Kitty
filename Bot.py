@@ -6,6 +6,19 @@ from datetime import datetime, timedelta
 from discord.ext import commands
 from flask import Flask
 from threading import Thread
+import aiosqlite
+import asyncio
+
+# --- Định nghĩa hàm tạo Database trước ---
+async def init_db():
+    async with aiosqlite.connect("database.db") as db:
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                user_id INTEGER PRIMARY KEY,
+                coins INTEGER DEFAULT 0
+            )
+        """)
+        await db.commit()
 
 # --- Khởi tạo Flask App cho Web Server ---
 app = Flask(__name__)
@@ -36,7 +49,9 @@ bot = commands.Bot(command_prefix="", intents=intents)
 
 @bot.event
 async def on_ready():
-    print(f'Bot {bot.user} đã sẵn sàng!')
+    # Tự động tạo file database.db ngay khi bot vừa khởi động
+    await init_db()
+    print(f'Bot {bot.user} đã sẵn sàng và Database đã được tạo!')
 
 
 @bot.event
@@ -64,7 +79,14 @@ async def on_message(message):
         'nunban',
         'nsanggay',
         'ntaogiftcode',
-        'ngiftcode'
+        'ngiftcode',
+        'nuser',
+        'meow',
+        'bum',
+        'chim',
+        'khoan',
+        'job',
+        'njob'
     ]
 
     # --- Danh sách các lệnh kinh tế/tương tác sẽ bị cấm khi bị ban ---
@@ -73,14 +95,12 @@ async def on_message(message):
     # --- Kiểm tra Blacklist ---
     if user_id in blacklist:
         if command_name in bot_commands:
-            # Nếu gõ lệnh kinh tế/tương tác thì hiện thông báo cấm cụ thể
             if command_name in restricted_commands:
                 reason = blacklist[user_id]
                 await message.channel.send(
                     f"{message.author.mention} Bạn đã bị ban bởi Admin với lí do: `{reason}` nên không thể sử dụng lệnh này!"
                 )
             else:
-                # Các lệnh khác giữ nguyên thông báo cũ
                 reason = blacklist[user_id]
                 await message.channel.send(
                     f"{message.author.mention} đã bị ban bởi Admin với lí do {reason}"
@@ -108,12 +128,10 @@ async def on_message(message):
 
         if last_time and now < last_time:
             wait_time = int((last_time - now).total_seconds() / 60) + 1
-
             await message.channel.send(
                 f"{message.author.mention} Bạn đang thấm mệt, "
                 f"hãy nghỉ ngơi {wait_time} phút nữa rồi quay lại nhé!"
             )
-
         else:
             if random.random() < 0.3:
                 rac = [
@@ -121,19 +139,13 @@ async def on_message(message):
                     'một cái áo rách',
                     'một mớ rác thải'
                 ]
-
                 await message.channel.send(
                     f'{message.author.mention} Bạn quăng cần xuống... '
                     f'và câu được {random.choice(rac)}. Chán thế!'
                 )
-
             else:
                 so_ca = random.randint(1, 10)
-
-                fish_storage[user_id] = (
-                    fish_storage.get(user_id, 0) + so_ca
-                )
-
+                fish_storage[user_id] = fish_storage.get(user_id, 0) + so_ca
                 await message.channel.send(
                     f'{message.author.mention} Bạn câu được {so_ca} con cá! '
                     f'Dùng `nbanca` để bán nhé.'
@@ -144,54 +156,36 @@ async def on_message(message):
     # 3. Lệnh nfish
     elif command_name == 'nfish':
         so_ca = fish_storage.get(user_id, 0)
-
-        await message.channel.send(
-            f"🐟 Bạn đang có {so_ca} con cá trong kho."
-        )
+        await message.channel.send(f"🐟 Bạn đang có {so_ca} con cá trong kho.")
 
     # 4. Lệnh nbanca
     elif command_name == 'nbanca':
         so_ca = fish_storage.get(user_id, 0)
-
         if so_ca > 0:
             coin = so_ca * 5
-
             inventory[user_id] = inventory.get(user_id, 0) + coin
             fish_storage[user_id] = 0
-
             await message.channel.send(
                 f"Bạn đã bán {so_ca} con cá và nhận được {coin} coin! "
                 f"Tổng số dư: {inventory[user_id]} coin."
             )
-
         else:
-            await message.channel.send(
-                "Bạn không có cá để bán!"
-            )
+            await message.channel.send("Bạn không có cá để bán!")
 
     # 5. Lệnh nme
     elif command_name == 'nme':
         so_du = inventory.get(user_id, 0)
-
-        await message.channel.send(
-            f"💰 **Số dư của bạn:** {so_du} coin."
-        )
+        await message.channel.send(f"💰 **Số dư của bạn:** {so_du} coin.")
 
     # 6. Lệnh ndaily
     elif command_name == 'ndaily':
         today = now.strftime("%Y-%m-%d")
-
         if daily_check.get(user_id) == today:
-            await message.channel.send(
-                "Bạn đã nhận quà hôm nay rồi, mai quay lại nhé!"
-            )
-
+            await message.channel.send("Bạn đã nhận quà hôm nay rồi, mai quay lại nhé!")
         else:
             thuong = random.randint(1, 50)
-
             inventory[user_id] = inventory.get(user_id, 0) + thuong
             daily_check[user_id] = today
-
             await message.channel.send(
                 f"Bạn nhận được {thuong} coin! "
                 f"Tổng số dư: {inventory[user_id]} coin."
@@ -199,26 +193,18 @@ async def on_message(message):
 
     # 7. Lệnh nsanggay
     elif command_name == 'nsanggay':
-        await message.channel.send(
-            "cái gì v mẹ <:0GDroolingCat:1525444808972308540>"
-        )
+        await message.channel.send("cái gì v mẹ <:0GDroolingCat:1525444808972308540>")
 
     # 8. Lệnh nban / nunban
     elif command_name in ['nban', 'nunban']:
-
         if message.author.id != ADMIN_ID:
-            await message.channel.send(
-                "Bạn không có quyền này!"
-            )
+            await message.channel.send("Bạn không có quyền này!")
             return
 
         log_channel = bot.get_channel(LOG_CHANNEL_ID)
 
         if not message.mentions:
-            await message.channel.send(
-                "Hãy tag người dùng cần xử lý "
-                "(VD: `nban @user lí do`)!"
-            )
+            await message.channel.send("Hãy tag người dùng cần xử lý (VD: `nban @user lí do`)!")
             return
 
         target = message.mentions[0]
@@ -226,22 +212,13 @@ async def on_message(message):
 
         # --- BAN ---
         if command_name == 'nban':
-
             parts = message.content.split(' ', 2)
-            reason = (
-                parts[2]
-                if len(parts) > 2
-                else "không có lí do"
-            )
+            reason = parts[2] if len(parts) > 2 else "không có lí do"
 
             if target_id in blacklist:
-                await message.channel.send(
-                    "Người này đã bị cấm trước đó rồi!"
-                )
-
+                await message.channel.send("Người này đã bị cấm trước đó rồi!")
             else:
                 blacklist[target_id] = reason
-
                 if log_channel:
                     await log_channel.send(
                         f"🚫 **LOG BAN**\n"
@@ -249,32 +226,21 @@ async def on_message(message):
                         f"- Người thực hiện: {message.author.mention}\n"
                         f"- Lí do: {reason}"
                     )
-
-                await message.channel.send(
-                    f"bạn đã ban {target.mention} với lí do {reason}"
-                )
+                await message.channel.send(f"bạn đã ban {target.mention} với lí do {reason}")
 
         # --- UNBAN ---
         elif command_name == 'nunban':
-
             if target_id not in blacklist:
-                await message.channel.send(
-                    "Người này hiện không bị cấm!"
-                )
-
+                await message.channel.send("Người này hiện không bị cấm!")
             else:
                 del blacklist[target_id]
-
                 if log_channel:
                     await log_channel.send(
                         f"✅ **LOG UNBAN**\n"
                         f"- Người được gỡ ban: {target.mention}\n"
                         f"- Người thực hiện: {message.author.mention}"
                     )
-
-                await message.channel.send(
-                    f"Đã gỡ ban cho {target.mention}"
-                )
+                await message.channel.send(f"Đã gỡ ban cho {target.mention}")
 
     # 9. Tạo giftcode
     elif command_name == 'ntaogiftcode':
@@ -333,25 +299,15 @@ async def on_message(message):
         if giftcode["uses_left"] == 0:
             del gift_codes[code]
 
-     # 11. Job command
+    # 11. Job command
     elif command_name in ['job', 'njob']:
-        await message.channel.send(
-            "Đi kiếm việc làm đi, bot ko có chức năng đó! :h_:"
-        )
+        await message.channel.send("Đi kiếm việc làm đi, bot ko có chức năng đó! :h_:")
 
-    # 12. nuser gay
+    # 12. Lệnh nuser
     elif command_name == 'nuser':
-        await message.channel.send(
-            "đang tét"
-        )
+        await message.channel.send("đang tét")
 
-    # 13. nuser gay
-    elif command_name == 'nuser':
-        await message.channel.send(
-            "đang tét"
-        )
-
-    #lệnh xàm
+    # Lệnh xàm
     elif command_name == 'meow':
         if os.path.exists("meow.png"):
             await message.channel.send(file=discord.File("meow.png"))
@@ -359,28 +315,21 @@ async def on_message(message):
             await message.channel.send("Ảnh `meow.png` không tồn tại trong thư mục dự án!")
 
     elif command_name == 'bum':
-        await message.channel.send(
-            "https://cdn.discordapp.com/attachments/1505482821580619918/1537259392603258970/buhflipexplode.gif"
-        )
+        await message.channel.send("https://cdn.discordapp.com/attachments/1505482821580619918/1537259392603258970/buhflipexplode.gif")
 
     elif command_name == 'chim':
-        await message.channel.send(
-            "https://klipy.com/gifs/bung-chim"
-        )
+        await message.channel.send("https://klipy.com/gifs/bung-chim")
 
     elif command_name == 'khoan':
-        await message.channel.send(
-            "https://cdn.discordapp.com/attachments/1050078382018265178/1454397083413909630/ezgif-395a166e2e34663d.gif"
-        )
+        await message.channel.send("https://cdn.discordapp.com/attachments/1050078382018265178/1454397083413909630/ezgif-395a166e2e34663d.gif")
 
 
-    # --- Khởi chạy Flask Server ngầm và Bot ---
-    if __name__ == '__main__':
-        t = Thread(target=run_web)
-        t.daemon = True
-        t.start()
+# --- Điểm khởi chạy chính của chương trình (Đặt ở ngoài cùng, không nằm trong hàm on_message) ---
+if __name__ == '__main__':
+    # Chạy Web Server ngầm cho host (HidenCloud/Render)
+    t = Thread(target=run_web)
+    t.daemon = True
+    t.start()
 
-    # Khi test trên máy cá nhân, hãy thay tạm token vào đây.
-    # Khi đưa lên Render, nhớ đổi lại thành: bot.run(os.environ['DISCORD_TOKEN'])
-
-bot.run(os.environ['DISCORD_TOKEN'])
+    # Chạy bot Discord (Thay token của bạn vào đây hoặc dùng os.environ)
+    bot.run('cak')
