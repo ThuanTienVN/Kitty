@@ -317,6 +317,9 @@ async def on_message(message):
         if os.path.exists("bruh.png"):
             await message.channel.send(file=discord.File("bruh.png"))
 
+    elif command_name == 'ntilgay':
+        await message.channel.send("Đúng thật <:meomeo:1541455263507153046>")
+
     elif command_name == 'bum':
         await message.channel.send("https://cdn.discordapp.com/attachments/1505482821580619918/1537259392603258970/buhflipexplode.gif")
 
@@ -335,4 +338,5 @@ if __name__ == '__main__':
     t.start()
 
     # Chạy bot Discord (Thay token của bạn vào đây hoặc dùng os.environ)
-    bot.run('cak')
+token = os.getenv('DISCORD_TOKEN')
+client.run(token)
