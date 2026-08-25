@@ -224,11 +224,11 @@ async def on_message(message):
         if giftcode["uses_left"] == 0:
             del gift_codes[code]
 
-    elif command_name in ['job', 'njob']:
-        await message.channel.send("Đi kiếm việc làm đi, bot ko có chức năng đó! :h_:")
-
     elif command_name == 'nuser':
-        await message.channel.send("đang tét")
+        if not message.mentions:
+            await message.channel.send("Hãy tag người dùng cần xem thông tin (VD: `nuser @user`)!")
+            return
+        await message.channel.send(f"@{message.mentions[0].name} có số dư: **{inventory.get(str(message.mentions[0].id), 0)} coin** và số cá: **{fish_storage.get(str(message.mentions[0].id), 0)} con**.")
 
     # lệnh xàm
 
