@@ -34,6 +34,7 @@ def run_web():
 # --- Biến lưu trữ & Cấu hình ID ---
 ADMIN_ID = 1517328324618096711
 LOG_CHANNEL_ID = 1540982626364559370
+nmeogay_index = 0
 
 inventory = {}
 fish_storage = {}
