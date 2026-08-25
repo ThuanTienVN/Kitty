@@ -251,7 +251,7 @@ async def on_message(message):
         ]
         current_answer = phan_hoi[nmeogay_index]
         await message.channel.send(current_answer)
-        nmeogay_index = (nmeogay_index + 1) % len(phan_hoi_gay)
+        nmeogay_index = (nmeogay_index + 1) % len(phan_hoi)
 
 
     elif command_name == 'ntilgay':
