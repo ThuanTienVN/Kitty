@@ -248,7 +248,7 @@ async def on_message(message):
             "M gay nên tìm đồng minh à 💥"
             "Gõ đầu h <:meomeo:1541455263507153046>"
         ]
-        current_answer = phan_hoi_gay[nmeogay_index]
+        current_answer = phan_hoi[nmeogay_index]
         await message.channel.send(current_answer)
         nmeogay_index = (nmeogay_index + 1) % len(phan_hoi_gay)
 
