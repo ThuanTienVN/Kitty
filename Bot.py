@@ -245,8 +245,8 @@ async def on_message(message):
         phan_hoi = [
             "đi mà hỏi <@1517328324618096711>",
             "Ko có mà <:meow:1527225637880991765>",
-            "Đã bảo là ko có <:angry:1539477194097819850>"
-            "M gay nên tìm đồng minh à 💥"
+            "Đã bảo là ko có <:angry:1539477194097819850>",
+            "M gay nên tìm đồng minh à 💥",
             "Gõ đầu h <:meomeo:1541455263507153046>"
         ]
         current_answer = phan_hoi[nmeogay_index]
