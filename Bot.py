@@ -8,6 +8,7 @@ from flask import Flask
 from threading import Thread
 import aiosqlite
 import asyncio
+import random
 
 # --- Định nghĩa hàm tạo Database trước ---
 async def init_db():
@@ -228,6 +229,8 @@ async def on_message(message):
     elif command_name == 'nuser':
         await message.channel.send("đang tét")
 
+    # lệnh xàm
+
     elif command_name == 'meow':
         if os.path.exists("meow.png"):
             await message.channel.send(file=discord.File("meow.png"))
@@ -235,6 +238,20 @@ async def on_message(message):
     elif command_name == 'bruh':
         if os.path.exists("bruh.png"):
             await message.channel.send(file=discord.File("bruh.png"))
+
+    elif command_name == 'nmeogay':
+        global nmeogay_index
+        phan_hoi = [
+            "đi mà hỏi <@1517328324618096711>",
+            "Ko có mà <:meow:1527225637880991765>",
+            "Đã bảo là ko có <:angry:1539477194097819850>"
+            "M gay nên tìm đồng minh à 💥"
+            "Gõ đầu h <:meomeo:1541455263507153046>"
+        ]
+        current_answer = phan_hoi_gay[nmeogay_index]
+        await message.channel.send(current_answer)
+        nmeogay_index = (nmeogay_index + 1) % len(phan_hoi_gay)
+
 
     elif command_name == 'ntilgay':
         await message.channel.send("Đúng thật <:meomeo:1541455263507153046>")
