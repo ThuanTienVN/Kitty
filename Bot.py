@@ -228,7 +228,7 @@ async def on_message(message):
         if not message.mentions:
             await message.channel.send("Hãy tag người dùng cần xem thông tin (VD: `nuser @user`)!")
             return
-        await message.channel.send(f"@{message.mentions[0].name} có số dư: **{inventory.get(str(message.mentions[0].id), 0)} coin** và số cá: **{fish_storage.get(str(message.mentions[0].id), 0)} con**.")
+        await message.channel.send(f"{target.mention} có số dư: **{inventory.get(str(target.id), 0)} coin** và số cá: **{fish_storage.get(str(target.id), 0)} con**.")
 
     # lệnh xàm
 
